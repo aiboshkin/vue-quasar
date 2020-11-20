@@ -1,15 +1,13 @@
 <template>
-  <div class="flex justify-center items-center" style="height: 100vh">
+  <div class="flex justify-center items-center wrapper">
 
     <q-form
-      action="http://localhost:3000/users"
-      method="post"
-      class="q-gutter-md"
-      style="width: 400px"
+      @submit="onSubmit"
+      ref="v-form"
+      class="q-gutter-md v-form"
     >
       <q-input
         v-model="email"
-        name="email"
         filled
         type="email"
         hint="Email"
@@ -18,7 +16,7 @@
         autocomplete="off"
         lazy-rules
         :rules="[
-          val => val && val.length > 0 || 'Необходимо ввести email',
+          val => !!val || 'Необходимо ввести email',
           val => /.+@.+\..+/.test(val) || 'Неправильно введен email'
         ]"
       >
@@ -29,7 +27,6 @@
 
       <q-input
         v-model="password"
-        name="password"
         filled
         :type="isPwd ? 'password' : 'text'"
         hint="Password" color="green"
@@ -37,7 +34,7 @@
         autocomplete="off"
         lazy-rules
         :rules="[
-          val => val && val.length > 0 || 'Необходимо ввести пароль'
+          val => !!val || 'Необходимо ввести пароль'
         ]"
       >
         <template v-slot:prepend>
@@ -47,7 +44,7 @@
           <q-icon
             :name="isPwd ? 'visibility_off' : 'visibility'"
             class="cursor-pointer"
-            @click="isPwd = !isPwd"
+            @click="togglePasswordIcon"
           />
         </template>
       </q-input>
@@ -61,6 +58,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 
 export default {
   name: 'LayoutDefault',  
@@ -70,11 +68,31 @@ export default {
       password: '',
       isPwd: true,
     }
+  },
+  methods: {
+    ...mapActions([
+      'POST_AUTORIZED_USER'
+    ]),
+    togglePasswordIcon() {
+      this.isPwd = !this.isPwd;
+    },
+    onSubmit() {
+      const user = {
+        email: this.email,
+        password: this.password
+      };
+      this.POST_AUTORIZED_USER(user);
+    }
   }
 }
 </script>
 
 
 <style>
-
+  .wrapper {
+    height: 100vh;
+  }
+  .v-form {
+    width: 400px;
+  }
 </style>
